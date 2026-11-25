@@ -1,4 +1,4 @@
-﻿"""Reachy Voice Lab: explicit generation actions, persistent session recordings."""
+"""Reachy Voice Lab: explicit generation actions, persistent session recordings."""
 import json
 from dataclasses import asdict
 from datetime import datetime
@@ -178,7 +178,8 @@ with export:
     chosen = None
     if source == "Voice Studio sample":
         if s.samples:
-            i = st.selectbox("Select saved sample", range(len(s.samples)), format_func=lambda i: f"{i+1}. {s.samples[i]['name']}")
+            labels = [f"{i+1}. {sample['name']}" for i, sample in enumerate(s.samples)]
+            i = labels.index(st.selectbox("Select saved sample", labels))
             chosen = s.samples[i]
         else:
             st.info("Save a sample in Voice Studio first.")

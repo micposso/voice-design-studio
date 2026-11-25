@@ -1,4 +1,4 @@
-﻿"""Local conversation and personality logic; no Streamlit dependency."""
+"""Local conversation and personality logic; no Streamlit dependency."""
 from dataclasses import dataclass
 import ollama
 
@@ -26,7 +26,9 @@ class Personality:
 def installed_models(host):
     try:
         response = ollama.Client(host=host, timeout=4).list()
-        return sorted(m.model for m in response.models if m.model)
+        return sorted(m.model for m in response.models if m.model
+                      and not getattr(m, "remote_host", None)
+                      and not m.model.endswith((":cloud", "-cloud")))
     except Exception:
         raise ConversationError("Ollama is unavailable. Start Ollama and click Refresh connections.") from None
 

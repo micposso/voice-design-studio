@@ -48,3 +48,19 @@ def test_missing_credentials():
         button(at, "Generate Voice").click().run()
         assert any("Add your ElevenLabs" in x.value for x in at.error)
         assert not at.exception
+
+def test_new_final_recording_and_reset():
+    with patch("config.load_config", return_value=Config("mock-key", "mock-voice", "", "http://localhost:11434")), patch("conversation.check_server", return_value=(False, [])), patch("voice.generate_audio", return_value=b"ID3final") as speech:
+        at = AppTest.from_file(APP).run()
+        at.slider(key="speed").set_value(1.2).run()
+        at.radio[0].set_value("New custom script").run()
+        next(x for x in at.text_area if x.label == "Final script").set_value("Welcome to the laboratory.").run()
+        button(at, "Generate Final Recording").click().run()
+        assert at.session_state.final["audio"] == b"ID3final"
+        assert at.session_state.final["configuration"]["voice_settings"]["speed"] == 1.2
+        assert "mock-key" not in str(at.session_state.final["configuration"])
+        assert any(x.proto.label == "Download MP3" for x in at.get("download_button"))
+        button(at, "Reset Settings").click().run()
+        assert at.session_state.speed == 1.0
+        assert speech.call_count == 1
+        assert not at.exception

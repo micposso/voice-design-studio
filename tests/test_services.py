@@ -1,4 +1,4 @@
-﻿from unittest.mock import Mock, patch
+from unittest.mock import Mock, patch
 import pytest
 from voice import Settings, VoiceError, generate_audio
 from conversation import Personality, ConversationError, generate_response, check_server, add_message
@@ -37,7 +37,7 @@ def test_missing_and_length():
 def test_local_conversation():
     with patch("conversation.ollama.Client") as factory:
         client = factory.return_value
-        client.list.return_value.models = [Mock(model="local:latest")]
+        client.list.return_value.models = [Mock(model="local:latest", remote_host=None)]
         assert check_server("http://localhost:11434") == (True, ["local:latest"])
         history = []
         add_message(history, "user", "Hello")
